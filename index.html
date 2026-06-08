@@ -1,0 +1,431 @@
+HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utility Consumption Tracker</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger: #dc2626;
+            --danger-hover: #b91c1c;
+            --success: #16a34a;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        header h1 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Dashboard Summary */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .card h3 {
+            font-size: 0.9rem;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        /* Main Content Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Form Styling */
+        .form-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .form-container h2 {
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Table/List Styling */
+        .table-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .table-container h2 {
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: var(--light);
+            font-weight: 600;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.6rem;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            color: white;
+        }
+
+        .btn-edit { background-color: #eab308; }
+        .btn-edit:hover { background-color: #ca8a04; }
+        .btn-delete { background-color: var(--danger); }
+        .btn-delete:hover { background-color: var(--danger-hover); }
+        .btn-save { background-color: var(--success); }
+
+        /* Inline editing inputs */
+        .edit-input {
+            width: 100%;
+            padding: 0.3rem;
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Consumption Tracker</h1>
+        <p>Rate per unit: <strong>225.00</strong></p>
+    </header>
+
+    <div class="dashboard">
+        <div class="card">
+            <h3>Fixed Rate</h3>
+            <p>225</p>
+        </div>
+        <div class="card">
+            <h3>Total Units</h3>
+            <p id="total-units">0</p>
+        </div>
+        <div class="card">
+            <h3>Total Amount</h3>
+            <p id="total-amount">0.00</p>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        <div class="form-container">
+            <h2 id="form-title">Add New Consumer</h2>
+            <form id="tracker-form">
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <label for="consumer-name">Consumer Name</label>
+                    <input type="text" id="consumer-name" required placeholder="e.g. John Doe">
+                </div>
+                <div class="form-group">
+                    <label for="initial-reading">Initial Reading</label>
+                    <input type="number" id="initial-reading" required min="0" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label for="final-reading">Final Reading</label>
+                    <input type="number" id="final-reading" required min="0" placeholder="0">
+                </div>
+                <button type="submit" class="btn btn-primary" id="submit-btn">Add Consumer</button>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <h2>Consumer History Log</h2>
+            <table id="history-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Initial</th>
+                        <th>Final</th>
+                        <th>Units</th>
+                        <th>Amount</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Configuration & State
+    const FIXED_RATE = 225;
+    let consumers = JSON.parse(localStorage.getItem('consumers')) || [];
+    let isEditingId = null;
+
+    // DOM Elements
+    const form = document.getElementById('tracker-form');
+    const nameInput = document.getElementById('consumer-name');
+    const initialInput = document.getElementById('initial-reading');
+    const finalInput = document.getElementById('final-reading');
+    const submitBtn = document.getElementById('submit-btn');
+    const tableBody = document.getElementById('table-body');
+    const totalUnitsEl = document.getElementById('total-units');
+    const totalAmountEl = document.getElementById('total-amount');
+
+    // Handle Form Submit (Add or update from form)
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const name = nameInput.value.trim();
+        const initial = parseFloat(initialInput.value);
+        const final = parseFloat(finalInput.value);
+
+        if (final < initial) {
+            alert("Error: Final reading cannot be less than initial reading.");
+            return;
+        }
+
+        if (isEditingId) {
+            // Update existing entry
+            consumers = consumers.map(c => c.id === isEditingId ? { ...c, name, initial, final } : c);
+            isEditingId = null;
+            submitBtn.textContent = "Add Consumer";
+            document.getElementById('form-title').textContent = "Add New Consumer";
+        } else {
+            // Create new entry
+            const newConsumer = {
+                id: Date.now().toString(),
+                name,
+                initial,
+                final
+            };
+            consumers.push(newConsumer);
+        }
+
+        saveAndRender();
+        form.reset();
+    });
+
+    // Delete Consumer
+    function deleteConsumer(id) {
+        if(confirm("Are you sure you want to delete this consumer record?")) {
+            consumers = consumers.filter(c => c.id !== id);
+            if(isEditingId === id) {
+                isEditingId = null;
+                submitBtn.textContent = "Add Consumer";
+                form.reset();
+            }
+            saveAndRender();
+        }
+    }
+
+    // Trigger Inline Editing State
+    function toggleInlineEdit(id) {
+        const row = document.getElementById(`row-${id}`);
+        const consumer = consumers.find(c => c.id === id);
+
+        // Replace text cells with inputs
+        row.innerHTML = `
+            <td><input type="text" class="edit-input" id="edit-name-${id}" value="${consumer.name}"></td>
+            <td><input type="number" class="edit-input" id="edit-initial-${id}" value="${consumer.initial}"></td>
+            <td><input type="number" class="edit-input" id="edit-final-${id}" value="${consumer.final}"></td>
+            <td colspan="2" style="color: gray; font-style: italic; text-align: center;">Calculated on save</td>
+            <td>
+                <div class="actions">
+                    <button class="btn-sm btn-save" onclick="saveInlineEdit('${id}')">Save</button>
+                    <button class="btn-sm btn-delete" onclick="renderTable()">Cancel</button>
+                </div>
+            </td>
+        `;
+    }
+
+    // Save Row Inline
+    function saveInlineEdit(id) {
+        const updatedName = document.getElementById(`edit-name-${id}`).value.trim();
+        const updatedInitial = parseFloat(document.getElementById(`edit-initial-${id}`).value);
+        const updatedFinal = parseFloat(document.getElementById(`edit-final-${id}`).value);
+
+        if (!updatedName || isNaN(updatedInitial) || isNaN(updatedFinal)) {
+            alert("Please fill out all fields correctly.");
+            return;
+        }
+
+        if (updatedFinal < updatedInitial) {
+            alert("Error: Final reading cannot be less than initial reading.");
+            return;
+        }
+
+        consumers = consumers.map(c => c.id === id ? { 
+            ...c, 
+            name: updatedName, 
+            initial: updatedInitial, 
+            final: updatedFinal 
+        } : c);
+
+        saveAndRender();
+    }
+
+    // Calculate totals and render screen
+    function saveAndRender() {
+        localStorage.setItem('consumers', JSON.stringify(consumers));
+        renderTable();
+        renderDashboard();
+    }
+
+    function renderTable() {
+        tableBody.innerHTML = '';
+
+        if(consumers.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #64748b;">No consumer data available.</td></tr>`;
+            return;
+        }
+
+        consumers.forEach(c => {
+            const units = c.final - c.initial;
+            const amount = units * FIXED_RATE;
+
+            const tr = document.createElement('tr');
+            tr.id = `row-${c.id}`;
+            tr.innerHTML = `
+                <td>${c.name}</td>
+                <td>${c.initial}</td>
+                <td>${c.final}</td>
+                <td><strong>${units}</strong></td>
+                <td><strong>${amount.toFixed(2)}</strong></td>
+                <td>
+                    <div class="actions">
+                        <button class="btn-sm btn-edit" onclick="toggleInlineEdit('${c.id}')">Edit</button>
+                        <button class="btn-sm btn-delete" onclick="deleteConsumer('${c.id}')">Delete</button>
+                    </div>
+                </td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    }
+
+    function renderDashboard() {
+        let totalUnits = 0;
+        let totalAmount = 0;
+
+        consumers.forEach(c => {
+            const units = c.final - c.initial;
+            totalUnits += units;
+            totalAmount += (units * FIXED_RATE);
+        });
+
+        totalUnitsEl.textContent = totalUnits;
+        totalAmountEl.textContent = totalAmount.toFixed(2);
+    }
+
+    // Initial App Load
+    saveAndRender();
+</script>
+</body>
+</html>
