@@ -160,7 +160,7 @@
             </div>
             <div>
               <label class="block font-medium text-slate-600 mb-1"
-                >Last Amount Paid (₦)</label
+                >Your Total Amount (₦)</label
               >
               <input
                 type="number"
@@ -282,12 +282,12 @@
                   class="bg-slate-50 text-slate-500 uppercase text-[11px] font-semibold tracking-wider border-b border-slate-100"
                 >
                   <th class="px-5 py-4">Consumer Name</th>
-                  <th class="px-3 py-4 w-28">Last Amount Paid (₦)</th>
+                  <th class="px-3 py-4 w-28">Your Total Amount (₦)</th>
                   <th class="px-3 py-4 w-24">Initial Rd</th>
                   <th class="px-3 py-4 w-24">Final Rd</th>
                   <th class="px-3 py-4 text-center">Units Used</th>
                   <th class="px-3 py-4">Eq. Cost</th>
-                  <th class="px-3 py-4">Balance</th>
+                  <th class="px-3 py-4">Current Balance</th>
                   <th class="px-4 py-4 text-center">Eq. Units Left</th>
                   <th class="px-4 py-4 text-center no-print">Action</th>
                 </tr>
@@ -344,7 +344,7 @@
         consumers.push({
           id: Date.now(),
           name,
-          lastAmountPaid,
+          YourTotalAmount,
           initialReading,
           finalReading,
         });
@@ -450,10 +450,10 @@
               consumers = parsed.consumers.map((c) => ({
                 id: c.id || Date.now() + Math.random(),
                 name: c.name || "Unnamed Consumer",
-                lastAmountPaid:
-                  c.lastAmountPaid !== undefined
-                    ? c.lastAmountPaid
-                    : c.amountPaid || 0,
+                YourTotalAmount:
+                  c.YourTotalAmount !== undefined
+                    ? c.YourTotalAmount
+                    : c.YourTotalAmount || 0,
                 initialReading: c.initialReading || 0,
                 finalReading: c.finalReading || 0,
               }));
@@ -495,7 +495,7 @@
 
         consumers.forEach((c) => {
           const lastPaid =
-            c.lastAmountPaid !== undefined ? c.lastAmountPaid : 0;
+            c.YourTotalAmount !== undefined ? c.YourTotalAmount : 0;
           const unitsConsumed = Math.max(0, c.finalReading - c.initialReading);
           const equivalentCost = unitsConsumed * currentRate;
 
