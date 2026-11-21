@@ -1,431 +1,594 @@
-HTML
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Utility Consumption Tracker</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Electricity Consumption App</title>
+    <!-- Tailwind CSS for sleek, modern styling -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --danger: #dc2626;
-            --danger-hover: #b91c1c;
-            --success: #16a34a;
-            --dark: #1e293b;
-            --light: #f8fafc;
-            --border: #e2e8f0;
-        }
+      /* Custom scrollbar for better UI */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
+      /* PDF / Print Layout Optimizations */
+      @media print {
         body {
-            background-color: #f1f5f9;
-            color: var(--dark);
-            padding: 2rem 1rem;
+          background: white;
+          color: black;
+          padding: 0;
+          margin: 0;
         }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
+        header,
+        .no-print,
+        form,
+        button,
+        input[type="file"],
+        .settings-card {
+          display: none !important;
         }
-
-        header {
-            margin-bottom: 2rem;
-            text-align: center;
+        main {
+          grid-template-columns: 1fr !important;
+          max-width: 100% !important;
+          padding: 0 !important;
+          margin: 0 !important;
         }
-
-        header h1 {
-            color: var(--primary);
-            margin-bottom: 0.5rem;
+        .dashboard-container {
+          border: none !important;
+          box-shadow: none !important;
+          width: 100% !important;
         }
-
-        /* Dashboard Summary */
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+        input[type="text"],
+        input[type="number"],
+        input[type="date"] {
+          border: none !important;
+          background: transparent !important;
+          padding: 0 !important;
+          pointer-events: none !important;
         }
-
-        .card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            text-align: center;
+        .print-header {
+          display: block !important;
+          margin-bottom: 20px;
         }
-
-        .card h3 {
-            font-size: 0.9rem;
-            color: #64748b;
-            text-transform: uppercase;
-            margin-bottom: 0.5rem;
-        }
-
-        .card p {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--dark);
-        }
-
-        /* Main Content Layout */
-        .main-layout {
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 2rem;
-        }
-
-        @media (max-width: 768px) {
-            .main-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Form Styling */
-        .form-container {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            height: fit-content;
-        }
-
-        .form-container h2 {
-            margin-bottom: 1rem;
-            font-size: 1.25rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.2rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.4rem;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.6rem;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 0.75rem;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-size: 1rem;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-
-        /* Table/List Styling */
-        .table-container {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            overflow-x: auto;
-        }
-
-        .table-container h2 {
-            margin-bottom: 1rem;
-            font-size: 1.25rem;
-        }
-
         table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
+          width: 100% !important;
+          table-layout: auto !important;
         }
-
-        th, td {
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--border);
+        th,
+        td {
+          padding: 6px 4px !important;
+          font-size: 10px !important;
         }
-
-        th {
-            background-color: var(--light);
-            font-weight: 600;
+        .badge-highlight {
+          border: 1px solid #cbd5e1 !important;
+          background: transparent !important;
+          color: black !important;
+          padding: 2px 4px !important;
         }
-
-        .actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .btn-sm {
-            padding: 0.4rem 0.6rem;
-            font-size: 0.85rem;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            color: white;
-        }
-
-        .btn-edit { background-color: #eab308; }
-        .btn-edit:hover { background-color: #ca8a04; }
-        .btn-delete { background-color: var(--danger); }
-        .btn-delete:hover { background-color: var(--danger-hover); }
-        .btn-save { background-color: var(--success); }
-
-        /* Inline editing inputs */
-        .edit-input {
-            width: 100%;
-            padding: 0.3rem;
-            border: 1px solid var(--primary);
-            border-radius: 4px;
-        }
+      }
+      .print-header {
+        display: none;
+      }
     </style>
-</head>
-<body>
-
-<div class="container">
-    <header>
-        <h1>Consumption Tracker</h1>
-        <p>Rate per unit: <strong>225.00</strong></p>
+  </head>
+  <body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12">
+    <!-- Navbar -->
+    <header class="bg-indigo-600 text-white shadow-md mb-8">
+      <div
+        class="max-w-7xl mx-auto px-4 py-5 flex justify-between items-center"
+      >
+        <h1 class="text-2xl font-bold tracking-tight">
+          🇳🇬 Electricity Consumption App
+        </h1>
+        <span
+          class="bg-indigo-500 text-xs font-semibold px-3 py-1.5 rounded-full"
+          >Currency: Naira (₦)</span
+        >
+      </div>
     </header>
 
-    <div class="dashboard">
-        <div class="card">
-            <h3>Fixed Rate</h3>
-            <p>225</p>
-        </div>
-        <div class="card">
-            <h3>Total Units</h3>
-            <p id="total-units">0</p>
-        </div>
-        <div class="card">
-            <h3>Total Amount</h3>
-            <p id="total-amount">0.00</p>
-        </div>
+    <!-- Hidden Print Title Section -->
+    <div class="print-header text-center border-b pb-4">
+      <h1 class="text-2xl font-bold">
+        Individual Consumption & Balance Report
+      </h1>
+      <p class="text-sm text-slate-500 mt-1" id="printDate"></p>
+      <p class="text-sm font-semibold mt-1" id="printRate"></p>
     </div>
 
-    <div class="main-layout">
-        <div class="form-container">
-            <h2 id="form-title">Add New Consumer</h2>
-            <form id="tracker-form">
-                <input type="hidden" id="edit-id">
-                <div class="form-group">
-                    <label for="consumer-name">Consumer Name</label>
-                    <input type="text" id="consumer-name" required placeholder="e.g. John Doe">
-                </div>
-                <div class="form-group">
-                    <label for="initial-reading">Initial Reading</label>
-                    <input type="number" id="initial-reading" required min="0" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label for="final-reading">Final Reading</label>
-                    <input type="number" id="final-reading" required min="0" placeholder="0">
-                </div>
-                <button type="submit" class="btn btn-primary" id="submit-btn">Add Consumer</button>
-            </form>
+    <main class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <!-- Left Sidebars (Config & Add forms) -->
+      <div class="space-y-6 lg:col-span-1 no-print">
+        <!-- Global Rate Configuration -->
+        <div
+          class="bg-white p-5 rounded-2xl shadow-xs border border-slate-100 settings-card"
+        >
+          <h2
+            class="text-sm font-bold mb-3 text-slate-700 flex items-center gap-2"
+          >
+            ⚙️ Rate Control
+          </h2>
+          <label class="block text-xs font-medium text-slate-600 mb-1"
+            >Rate per Unit (₦)</label
+          >
+          <div class="flex gap-2">
+            <input
+              type="number"
+              id="globalRate"
+              value="226"
+              min="0"
+              step="any"
+              class="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-semibold text-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+            />
+            <button
+              onclick="updateGlobalRate()"
+              class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-medium px-3 py-1.5 rounded-lg transition-colors text-xs"
+            >
+              Apply
+            </button>
+          </div>
         </div>
 
-        <div class="table-container">
-            <h2>Consumer History Log</h2>
-            <table id="history-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Initial</th>
-                        <th>Final</th>
-                        <th>Units</th>
-                        <th>Amount</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body">
-                    </tbody>
+        <!-- Add New Consumer Form -->
+        <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-100">
+          <h2 class="text-sm font-bold mb-3 text-slate-700">
+            👤 Add New Consumer
+          </h2>
+          <form id="consumerForm" class="space-y-3 text-xs">
+            <div>
+              <label class="block font-medium text-slate-600 mb-1"
+                >Consumer Name</label
+              >
+              <input
+                type="text"
+                id="name"
+                required
+                placeholder="e.g., Suite 4A / Flat"
+                class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block font-medium text-slate-600 mb-1"
+                  >Amount Paid (₦)</label
+                >
+                <input
+                  type="number"
+                  id="amountPaid"
+                  min="0"
+                  value="0"
+                  step="any"
+                  required
+                  class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <div>
+                <label class="block font-medium text-slate-600 mb-1"
+                  >Payment Date</label
+                >
+                <input
+                  type="date"
+                  id="lastPaidDate"
+                  required
+                  class="w-full px-2 py-2 border border-slate-200 rounded-lg text-xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block font-medium text-slate-600 mb-1"
+                  >Initial Reading</label
+                >
+                <input
+                  type="number"
+                  id="initialReading"
+                  min="0"
+                  value="0"
+                  step="any"
+                  required
+                  class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <div>
+                <label class="block font-medium text-slate-600 mb-1"
+                  >Final Reading</label
+                >
+                <input
+                  type="number"
+                  id="finalReading"
+                  min="0"
+                  value="0"
+                  step="any"
+                  required
+                  class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg text-sm transition-colors shadow-xs mt-2"
+            >
+              + Add to Tracker
+            </button>
+          </form>
+        </div>
+
+        <!-- Data Management (Save/Restore Files) -->
+        <div
+          class="bg-white p-5 rounded-2xl shadow-xs border border-slate-100 space-y-3"
+        >
+          <h2 class="text-sm font-bold text-slate-700">
+            💾 Save & Backup Templates
+          </h2>
+          <p class="text-xs text-slate-400 leading-normal">
+            Save your system state data externally to use later or swap setups.
+          </p>
+          <button
+            onclick="backupData()"
+            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5"
+          >
+            📥 Backup Data File (.json)
+          </button>
+          <div class="pt-1">
+            <label class="block text-xs font-semibold text-slate-500 mb-1"
+              >Upload Saved Template File:</label
+            >
+            <input
+              type="file"
+              id="importFile"
+              accept=".json"
+              onchange="restoreData(event)"
+              class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side Dashboard Table Column -->
+      <div class="lg:col-span-3">
+        <div
+          class="bg-white rounded-2xl shadow-xs border border-slate-100 overflow-hidden dashboard-container"
+        >
+          <div
+            class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+          >
+            <div>
+              <h2 class="text-xl font-bold text-slate-800">
+                Consumer Dashboard
+              </h2>
+              <p class="text-sm text-slate-400 no-print">
+                Click directly inside table entries to edit history instantly.
+              </p>
+            </div>
+            <div class="flex items-center gap-2 no-print">
+              <button
+                onclick="exportToPDF()"
+                class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 shadow-xs"
+              >
+                🖨️ Export Dashboard (PDF)
+              </button>
+              <button
+                onclick="clearAllData()"
+                class="text-xs bg-red-50 hover:bg-red-100 text-red-600 font-medium px-3 py-2 rounded-lg transition-colors"
+              >
+                Clear Data
+              </button>
+            </div>
+          </div>
+
+          <!-- Main Tracker Table Elements -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse whitespace-nowrap">
+              <thead>
+                <tr
+                  class="bg-slate-50 text-slate-500 uppercase text-[11px] font-semibold tracking-wider border-b border-slate-100"
+                >
+                  <th class="px-4 py-4">Consumer Name</th>
+                  <th class="px-3 py-4 w-28">Total Paid (₦)</th>
+                  <th class="px-3 py-4 w-28">Last Paid (₦)</th>
+                  <th class="px-3 py-4 w-32">Last Paid Date</th>
+                  <th class="px-3 py-4 w-24">Initial Rd</th>
+                  <th class="px-3 py-4 w-24">Final Rd</th>
+                  <th class="px-3 py-4 text-center">Units Used</th>
+                  <th class="px-3 py-4">Eq. Cost</th>
+                  <th class="px-3 py-4">Balance</th>
+                  <th class="px-4 py-4 text-center">Eq. Units Left</th>
+                  <th class="px-4 py-4 text-center no-print">Action</th>
+                </tr>
+              </thead>
+              <tbody id="trackerBody" class="divide-y divide-slate-100 text-xs">
+                <!-- Injected JS Content dynamic loops rows -->
+              </tbody>
             </table>
+          </div>
+
+          <!-- Empty State Block -->
+          <div id="emptyState" class="p-12 text-center text-slate-400 hidden">
+            <p class="text-base mb-1">No consumer records found.</p>
+            <p class="text-xs">
+              Fill out the left configuration panels to populate live tracker
+              logs.
+            </p>
+          </div>
         </div>
-    </div>
-</div>
+      </div>
+    </main>
 
-<script>
-    // Configuration & State
-    const FIXED_RATE = 225;
-    let consumers = JSON.parse(localStorage.getItem('consumers')) || [];
-    let isEditingId = null;
+    <script>
+      // System Core State Initializer
+      let consumers = JSON.parse(localStorage.getItem("consumers_v2")) || [];
+      let currentRate =
+        parseFloat(localStorage.getItem("globalRate_v2")) || 225;
 
-    // DOM Elements
-    const form = document.getElementById('tracker-form');
-    const nameInput = document.getElementById('consumer-name');
-    const initialInput = document.getElementById('initial-reading');
-    const finalInput = document.getElementById('final-reading');
-    const submitBtn = document.getElementById('submit-btn');
-    const tableBody = document.getElementById('table-body');
-    const totalUnitsEl = document.getElementById('total-units');
-    const totalAmountEl = document.getElementById('total-amount');
+      // Element Referencer Links
+      document.getElementById("globalRate").value = currentRate;
+      const lastPaidDateInput = document.getElementById("lastPaidDate");
+      lastPaidDateInput.valueAsDate = new Date(); // Default date picker to today
 
-    // Handle Form Submit (Add or update from form)
-    form.addEventListener('submit', (e) => {
+      const consumerForm = document.getElementById("consumerForm");
+      const trackerBody = document.getElementById("trackerBody");
+      const emptyState = document.getElementById("emptyState");
+
+      // Capture Submission Event Listener Hook
+      consumerForm.addEventListener("submit", (e) => {
         e.preventDefault();
 
-        const name = nameInput.value.trim();
-        const initial = parseFloat(initialInput.value);
-        const final = parseFloat(finalInput.value);
+        const name = document.getElementById("name").value.trim();
+        const amountPaid =
+          parseFloat(document.getElementById("amountPaid").value) || 0;
+        const lastPaidDate =
+          document.getElementById("lastPaidDate").value ||
+          new Date().toISOString().slice(0, 10);
+        const initialReading =
+          parseFloat(document.getElementById("initialReading").value) || 0;
+        const finalReading =
+          parseFloat(document.getElementById("finalReading").value) || 0;
 
-        if (final < initial) {
-            alert("Error: Final reading cannot be less than initial reading.");
-            return;
+        if (finalReading < initialReading) {
+          alert(
+            "⚠️ Validation Warning: Final reading cannot verify as lower than initial inputs.",
+          );
+          return;
         }
 
-        if (isEditingId) {
-            // Update existing entry
-            consumers = consumers.map(c => c.id === isEditingId ? { ...c, name, initial, final } : c);
-            isEditingId = null;
-            submitBtn.textContent = "Add Consumer";
-            document.getElementById('form-title').textContent = "Add New Consumer";
+        consumers.push({
+          id: Date.now(),
+          name,
+          amountPaid,
+          lastAmountPaid: amountPaid, // Sets initial payment as last payment
+          lastPaidDate,
+          initialReading,
+          finalReading,
+        });
+
+        saveAndRender();
+        consumerForm.reset();
+        lastPaidDateInput.valueAsDate = new Date(); // Reset date to today after form clear
+      });
+
+      // Mutate Active Rate Configuration
+      function updateGlobalRate() {
+        const inputRate = parseFloat(
+          document.getElementById("globalRate").value,
+        );
+        if (!isNaN(inputRate) && inputRate >= 0) {
+          currentRate = inputRate;
+          localStorage.setItem("globalRate_v2", currentRate);
+          renderTable();
         } else {
-            // Create new entry
-            const newConsumer = {
-                id: Date.now().toString(),
-                name,
-                initial,
-                final
-            };
-            consumers.push(newConsumer);
+          alert("Provide valid arithmetic pricing parameters.");
         }
+      }
 
-        saveAndRender();
-        form.reset();
-    });
-
-    // Delete Consumer
-    function deleteConsumer(id) {
-        if(confirm("Are you sure you want to delete this consumer record?")) {
-            consumers = consumers.filter(c => c.id !== id);
-            if(isEditingId === id) {
-                isEditingId = null;
-                submitBtn.textContent = "Add Consumer";
-                form.reset();
-            }
-            saveAndRender();
+      // Handle Table Row Cell Modifications Directly
+      function updateField(id, field, value) {
+        const index = consumers.findIndex((c) => c.id === id);
+        if (index !== -1) {
+          if (field === "name") {
+            consumers[index].name = value.trim() || "Unnamed Consumer";
+          } else if (field === "lastPaidDate") {
+            consumers[index].lastPaidDate = value;
+          } else {
+            consumers[index][field] = parseFloat(value) || 0;
+          }
+          localStorage.setItem("consumers_v2", JSON.stringify(consumers));
+          renderTable();
         }
-    }
+      }
 
-    // Trigger Inline Editing State
-    function toggleInlineEdit(id) {
-        const row = document.getElementById(`row-${id}`);
-        const consumer = consumers.find(c => c.id === id);
-
-        // Replace text cells with inputs
-        row.innerHTML = `
-            <td><input type="text" class="edit-input" id="edit-name-${id}" value="${consumer.name}"></td>
-            <td><input type="number" class="edit-input" id="edit-initial-${id}" value="${consumer.initial}"></td>
-            <td><input type="number" class="edit-input" id="edit-final-${id}" value="${consumer.final}"></td>
-            <td colspan="2" style="color: gray; font-style: italic; text-align: center;">Calculated on save</td>
-            <td>
-                <div class="actions">
-                    <button class="btn-sm btn-save" onclick="saveInlineEdit('${id}')">Save</button>
-                    <button class="btn-sm btn-delete" onclick="renderTable()">Cancel</button>
-                </div>
-            </td>
-        `;
-    }
-
-    // Save Row Inline
-    function saveInlineEdit(id) {
-        const updatedName = document.getElementById(`edit-name-${id}`).value.trim();
-        const updatedInitial = parseFloat(document.getElementById(`edit-initial-${id}`).value);
-        const updatedFinal = parseFloat(document.getElementById(`edit-final-${id}`).value);
-
-        if (!updatedName || isNaN(updatedInitial) || isNaN(updatedFinal)) {
-            alert("Please fill out all fields correctly.");
-            return;
+      // Delete Row Functionality
+      function deleteConsumer(id) {
+        if (
+          confirm(
+            "Confirm removal of the individual log entry from the active session?",
+          )
+        ) {
+          consumers = consumers.filter((c) => c.id !== id);
+          saveAndRender();
         }
+      }
 
-        if (updatedFinal < updatedInitial) {
-            alert("Error: Final reading cannot be less than initial reading.");
-            return;
+      // Master Wipe Routine
+      function clearAllData() {
+        if (
+          confirm(
+            "Wipe tracker record operations completely? (Unsaved localized templates disappear unless exported)",
+          )
+        ) {
+          consumers = [];
+          saveAndRender();
         }
+      }
 
-        consumers = consumers.map(c => c.id === id ? { 
-            ...c, 
-            name: updatedName, 
-            initial: updatedInitial, 
-            final: updatedFinal 
-        } : c);
-
-        saveAndRender();
-    }
-
-    // Calculate totals and render screen
-    function saveAndRender() {
-        localStorage.setItem('consumers', JSON.stringify(consumers));
+      // Save State Array & Render Document Output Engine
+      function saveAndRender() {
+        localStorage.setItem("consumers_v2", JSON.stringify(consumers));
         renderTable();
-        renderDashboard();
-    }
+      }
 
-    function renderTable() {
-        tableBody.innerHTML = '';
+      // External Template File Backups (Save for another use)
+      function backupData() {
+        if (consumers.length === 0) {
+          alert(
+            "No active application data points to generate templates for export.",
+          );
+          return;
+        }
+        const dataStr =
+          "data:text/json;charset=utf-8," +
+          encodeURIComponent(
+            JSON.stringify({
+              rate: currentRate,
+              consumers: consumers,
+            }),
+          );
+        const downloadAnchor = document.createElement("a");
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute(
+          "download",
+          `consumption_tracker_backup_${new Date().toISOString().slice(0, 10)}.json`,
+        );
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+      }
 
-        if(consumers.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #64748b;">No consumer data available.</td></tr>`;
-            return;
+      // Restore Template Backup File System
+      function restoreData(event) {
+        const input = event.target;
+        const reader = new FileReader();
+        reader.onload = function () {
+          try {
+            const parsed = JSON.parse(reader.result);
+            if (parsed.consumers && Array.isArray(parsed.consumers)) {
+              currentRate = parsed.rate || 225;
+              consumers = parsed.consumers;
+              document.getElementById("globalRate").value = currentRate;
+              localStorage.setItem("globalRate_v2", currentRate);
+              saveAndRender();
+              alert("Template data metrics imported successfully!");
+            } else {
+              alert("Invalid file matrix standard configuration.");
+            }
+          } catch (err) {
+            alert(
+              "Failure to properly decode backup file template layout structures.",
+            );
+          }
+        };
+        if (input.files[0]) reader.readAsText(input.files[0]);
+      }
+
+      // Export Print Optimization Engine
+      function exportToPDF() {
+        document.getElementById("printDate").innerText =
+          `Generated On: ${new Date().toLocaleString()}`;
+        document.getElementById("printRate").innerText =
+          `Calculated base tariff standard rate: ₦${currentRate.toFixed(2)} per unit.`;
+        window.print();
+      }
+
+      // Core Reactive Calculations Processing Engine
+      function renderTable() {
+        trackerBody.innerHTML = "";
+
+        if (consumers.length === 0) {
+          emptyState.classList.remove("hidden");
+          return;
+        } else {
+          emptyState.classList.add("hidden");
         }
 
-        consumers.forEach(c => {
-            const units = c.final - c.initial;
-            const amount = units * FIXED_RATE;
+        consumers.forEach((c) => {
+          // Backward compatibility for existing records without the new fields
+          const lastAmt =
+            c.lastAmountPaid !== undefined ? c.lastAmountPaid : c.amountPaid;
+          const lastDate = c.lastPaidDate || "";
 
-            const tr = document.createElement('tr');
-            tr.id = `row-${c.id}`;
-            tr.innerHTML = `
-                <td>${c.name}</td>
-                <td>${c.initial}</td>
-                <td>${c.final}</td>
-                <td><strong>${units}</strong></td>
-                <td><strong>${amount.toFixed(2)}</strong></td>
-                <td>
-                    <div class="actions">
-                        <button class="btn-sm btn-edit" onclick="toggleInlineEdit('${c.id}')">Edit</button>
-                        <button class="btn-sm btn-delete" onclick="deleteConsumer('${c.id}')">Delete</button>
-                    </div>
-                </td>
-            `;
-            tableBody.appendChild(tr);
+          const unitsConsumed = Math.max(0, c.finalReading - c.initialReading);
+          const equivalentCost = unitsConsumed * currentRate;
+          const balance = c.amountPaid - equivalentCost;
+          const unitsLeft = currentRate > 0 ? balance / currentRate : 0;
+
+          const balanceClass =
+            balance >= 0
+              ? "text-green-600 font-semibold"
+              : "text-red-600 font-semibold";
+          const readingErrorMsg =
+            c.finalReading < c.initialReading ? "border-red-400 bg-red-50" : "";
+
+          let unitsLeftBadge = "";
+          if (balance > 0) {
+            unitsLeftBadge = `<span class="badge-highlight bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-bold border border-emerald-200 shadow-2xs">+${unitsLeft.toFixed(2)} units</span>`;
+          } else if (balance < 0) {
+            unitsLeftBadge = `<span class="badge-highlight bg-rose-50 text-rose-700 px-2.5 py-1 rounded-full font-bold border border-rose-200 shadow-2xs">0.00 units (Arrears)</span>`;
+          } else {
+            unitsLeftBadge = `<span class="badge-highlight bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-medium">0.00 units</span>`;
+          }
+
+          const tr = document.createElement("tr");
+          tr.className = "hover:bg-slate-50/80 transition-colors";
+          tr.innerHTML = `
+                    <td class="px-4 py-2.5">
+                        <input type="text" value="${c.name}" onchange="updateField(${c.id}, 'name', this.value)"
+                               class="w-full bg-transparent border border-transparent hover:border-slate-200 focus:bg-white focus:border-indigo-500 rounded px-2 py-1 font-medium text-slate-700 focus:outline-hidden">
+                    </td>
+                    <td class="px-3 py-2.5">
+                        <input type="number" step="any" value="${c.amountPaid}" onchange="updateField(${c.id}, 'amountPaid', this.value)"
+                               class="w-full bg-transparent border border-transparent hover:border-slate-200 focus:bg-white focus:border-indigo-500 rounded px-2 py-1 focus:outline-hidden font-mono">
+                    </td>
+                    <td class="px-3 py-2.5">
+                        <input type="number" step="any" value="${lastAmt}" onchange="updateField(${c.id}, 'lastAmountPaid', this.value)"
+                               class="w-full bg-transparent border border-transparent hover:border-slate-200 focus:bg-white focus:border-indigo-500 rounded px-2 py-1 focus:outline-hidden font-mono text-indigo-700 font-medium">
+                    </td>
+                    <td class="px-3 py-2.5">
+                        <input type="date" value="${lastDate}" onchange="updateField(${c.id}, 'lastPaidDate', this.value)"
+                               class="w-full bg-transparent border border-transparent hover:border-slate-200 focus:bg-white focus:border-indigo-500 rounded px-1.5 py-1 focus:outline-hidden text-slate-600">
+                    </td>
+                    <td class="px-3 py-2.5">
+                        <input type="number" step="any" value="${c.initialReading}" onchange="updateField(${c.id}, 'initialReading', this.value)"
+                               class="w-full bg-transparent border border-transparent hover:border-slate-200 focus:bg-white focus:border-indigo-500 rounded px-2 py-1 focus:outline-hidden font-mono ${readingErrorMsg}">
+                    </td>
+                    <td class="px-3 py-2.5">
+                        <input type="number" step="any" value="${c.finalReading}" onchange="updateField(${c.id}, 'finalReading', this.value)"
+                               class="w-full bg-transparent border border-transparent hover:border-slate-200 focus:bg-white focus:border-indigo-500 rounded px-2 py-1 focus:outline-hidden font-mono ${readingErrorMsg}">
+                    </td>
+                    <td class="px-3 py-2.5 text-center font-mono font-medium text-slate-600">
+                        ${unitsConsumed.toFixed(2)}
+                    </td>
+                    <td class="px-3 py-2.5 font-mono text-slate-700">
+                        ₦${equivalentCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </td>
+                    <td class="px-3 py-2.5 font-mono ${balanceClass}">
+                        ${balance >= 0 ? "" : "-"}₦${Math.abs(balance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </td>
+                    <td class="px-4 py-2.5 text-center text-xs font-mono">
+                        ${unitsLeftBadge}
+                    </td>
+                    <td class="px-4 py-2.5 text-center no-print">
+                        <button onclick="deleteConsumer(${c.id})" class="text-[11px] bg-red-50 hover:bg-red-500 hover:text-white text-red-500 font-medium px-2 py-1 rounded border border-red-100 transition-all cursor-pointer">
+                            Remove
+                        </button>
+                    </td>
+                `;
+          trackerBody.appendChild(tr);
         });
-    }
+      }
 
-    function renderDashboard() {
-        let totalUnits = 0;
-        let totalAmount = 0;
-
-        consumers.forEach(c => {
-            const units = c.final - c.initial;
-            totalUnits += units;
-            totalAmount += (units * FIXED_RATE);
-        });
-
-        totalUnitsEl.textContent = totalUnits;
-        totalAmountEl.textContent = totalAmount.toFixed(2);
-    }
-
-    // Initial App Load
-    saveAndRender();
-</script>
-</body>
+      // Initial Data Sync Boot Execution Call
+      renderTable();
+    </script>
+  </body>
 </html>
