@@ -89,7 +89,7 @@
         class="max-w-7xl mx-auto px-4 py-5 flex justify-between items-center"
       >
         <h1 class="text-2xl font-bold tracking-tight">
-          Units Consumption Tracker
+          Unit Consumption Tracker
         </h1>
         <span
           class="bg-indigo-500 text-xs font-semibold px-3 py-1.5 rounded-full"
@@ -100,9 +100,7 @@
 
     <!-- Hidden Print Title Section -->
     <div class="print-header text-center border-b pb-4">
-      <h1 class="text-2xl font-bold">
-        Electricity Consumption & Balance Report
-      </h1>
+      <h1 class="text-2xl font-bold">Consume Unit & Balance Report</h1>
       <p class="text-sm text-slate-500 mt-1" id="printDate"></p>
       <p class="text-sm font-semibold mt-1" id="printRate"></p>
     </div>
@@ -154,13 +152,13 @@
                 type="text"
                 id="name"
                 required
-                placeholder="e.g., Flat"
+                placeholder="e.g., Suite 4A / John"
                 class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div>
               <label class="block font-medium text-slate-600 mb-1"
-                >Your Total Amount (₦)</label
+                >Last Amount Paid (₦)</label
               >
               <input
                 type="number"
@@ -282,12 +280,12 @@
                   class="bg-slate-50 text-slate-500 uppercase text-[11px] font-semibold tracking-wider border-b border-slate-100"
                 >
                   <th class="px-5 py-4">Consumer Name</th>
-                  <th class="px-3 py-4 w-28">Your Total Amount (₦)</th>
+                  <th class="px-3 py-4 w-28">Your Net (₦)</th>
                   <th class="px-3 py-4 w-24">Initial Rd</th>
                   <th class="px-3 py-4 w-24">Final Rd</th>
                   <th class="px-3 py-4 text-center">Units Used</th>
                   <th class="px-3 py-4">Eq. Cost</th>
-                  <th class="px-3 py-4">Current Balance</th>
+                  <th class="px-3 py-4">YourCurrentBalance</th>
                   <th class="px-4 py-4 text-center">Eq. Units Left</th>
                   <th class="px-4 py-4 text-center no-print">Action</th>
                 </tr>
@@ -344,7 +342,7 @@
         consumers.push({
           id: Date.now(),
           name,
-          YourTotalAmount,
+          lastAmountPaid,
           initialReading,
           finalReading,
         });
@@ -450,10 +448,10 @@
               consumers = parsed.consumers.map((c) => ({
                 id: c.id || Date.now() + Math.random(),
                 name: c.name || "Unnamed Consumer",
-                YourTotalAmount:
-                  c.LastAmountPaid !== undefined
-                    ? c.LastAmountPaid
-                    : c.LastAmountPaid || 0,
+                lastAmountPaid:
+                  c.lastAmountPaid !== undefined
+                    ? c.lastAmountPaid
+                    : c.amountPaid || 0,
                 initialReading: c.initialReading || 0,
                 finalReading: c.finalReading || 0,
               }));
@@ -495,7 +493,7 @@
 
         consumers.forEach((c) => {
           const lastPaid =
-            c.YourTotalAmount !== undefined ? c.YourTotalAmount : 0;
+            c.lastAmountPaid !== undefined ? c.lastAmountPaid : 0;
           const unitsConsumed = Math.max(0, c.finalReading - c.initialReading);
           const equivalentCost = unitsConsumed * currentRate;
 
