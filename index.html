@@ -51,8 +51,7 @@
           width: 100% !important;
         }
         input[type="text"],
-        input[type="number"],
-        input[type="date"] {
+        input[type="number"] {
           border: none !important;
           background: transparent !important;
           padding: 0 !important;
@@ -68,8 +67,8 @@
         }
         th,
         td {
-          padding: 6px 4px !important;
-          font-size: 10px !important;
+          padding: 8px 4px !important;
+          font-size: 11px !important;
         }
         .badge-highlight {
           border: 1px solid #cbd5e1 !important;
@@ -90,7 +89,7 @@
         class="max-w-7xl mx-auto px-4 py-5 flex justify-between items-center"
       >
         <h1 class="text-2xl font-bold tracking-tight">
-          🇳🇬 Electricity Consumption App
+          Units Consumption Tracker
         </h1>
         <span
           class="bg-indigo-500 text-xs font-semibold px-3 py-1.5 rounded-full"
@@ -102,7 +101,7 @@
     <!-- Hidden Print Title Section -->
     <div class="print-header text-center border-b pb-4">
       <h1 class="text-2xl font-bold">
-        Individual Consumption & Balance Report
+        Electricity Consumption & Balance Report
       </h1>
       <p class="text-sm text-slate-500 mt-1" id="printDate"></p>
       <p class="text-sm font-semibold mt-1" id="printRate"></p>
@@ -155,36 +154,23 @@
                 type="text"
                 id="name"
                 required
-                placeholder="e.g., Suite 4A / Flat"
+                placeholder="e.g., Flat"
                 class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
               />
             </div>
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block font-medium text-slate-600 mb-1"
-                  >Amount Paid (₦)</label
-                >
-                <input
-                  type="number"
-                  id="amountPaid"
-                  min="0"
-                  value="0"
-                  step="any"
-                  required
-                  class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-              <div>
-                <label class="block font-medium text-slate-600 mb-1"
-                  >Payment Date</label
-                >
-                <input
-                  type="date"
-                  id="lastPaidDate"
-                  required
-                  class="w-full px-2 py-2 border border-slate-200 rounded-lg text-xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
+            <div>
+              <label class="block font-medium text-slate-600 mb-1"
+                >Last Paid (₦)</label
+              >
+              <input
+                type="number"
+                id="lastAmountPaid"
+                min="0"
+                value="0"
+                step="any"
+                required
+                class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+              />
             </div>
             <div class="grid grid-cols-2 gap-2">
               <div>
@@ -295,10 +281,8 @@
                 <tr
                   class="bg-slate-50 text-slate-500 uppercase text-[11px] font-semibold tracking-wider border-b border-slate-100"
                 >
-                  <th class="px-4 py-4">Consumer Name</th>
-                  <th class="px-3 py-4 w-28">Total Paid (₦)</th>
+                  <th class="px-5 py-4">Consumer Name</th>
                   <th class="px-3 py-4 w-28">Last Paid (₦)</th>
-                  <th class="px-3 py-4 w-32">Last Paid Date</th>
                   <th class="px-3 py-4 w-24">Initial Rd</th>
                   <th class="px-3 py-4 w-24">Final Rd</th>
                   <th class="px-3 py-4 text-center">Units Used</th>
@@ -327,16 +311,13 @@
     </main>
 
     <script>
-      // System Core State Initializer
-      let consumers = JSON.parse(localStorage.getItem("consumers_v2")) || [];
+      // System Core State Initializer (Default rate set to 226)
+      let consumers = JSON.parse(localStorage.getItem("consumers_v3")) || [];
       let currentRate =
-        parseFloat(localStorage.getItem("globalRate_v2")) || 225;
+        parseFloat(localStorage.getItem("globalRate_v3")) || 226;
 
       // Element Referencer Links
       document.getElementById("globalRate").value = currentRate;
-      const lastPaidDateInput = document.getElementById("lastPaidDate");
-      lastPaidDateInput.valueAsDate = new Date(); // Default date picker to today
-
       const consumerForm = document.getElementById("consumerForm");
       const trackerBody = document.getElementById("trackerBody");
       const emptyState = document.getElementById("emptyState");
@@ -346,11 +327,8 @@
         e.preventDefault();
 
         const name = document.getElementById("name").value.trim();
-        const amountPaid =
-          parseFloat(document.getElementById("amountPaid").value) || 0;
-        const lastPaidDate =
-          document.getElementById("lastPaidDate").value ||
-          new Date().toISOString().slice(0, 10);
+        const lastAmountPaid =
+          parseFloat(document.getElementById("lastAmountPaid").value) || 0;
         const initialReading =
           parseFloat(document.getElementById("initialReading").value) || 0;
         const finalReading =
@@ -366,16 +344,13 @@
         consumers.push({
           id: Date.now(),
           name,
-          amountPaid,
-          lastAmountPaid: amountPaid, // Sets initial payment as last payment
-          lastPaidDate,
+          lastAmountPaid,
           initialReading,
           finalReading,
         });
 
         saveAndRender();
         consumerForm.reset();
-        lastPaidDateInput.valueAsDate = new Date(); // Reset date to today after form clear
       });
 
       // Mutate Active Rate Configuration
@@ -385,7 +360,7 @@
         );
         if (!isNaN(inputRate) && inputRate >= 0) {
           currentRate = inputRate;
-          localStorage.setItem("globalRate_v2", currentRate);
+          localStorage.setItem("globalRate_v3", currentRate);
           renderTable();
         } else {
           alert("Provide valid arithmetic pricing parameters.");
@@ -398,12 +373,10 @@
         if (index !== -1) {
           if (field === "name") {
             consumers[index].name = value.trim() || "Unnamed Consumer";
-          } else if (field === "lastPaidDate") {
-            consumers[index].lastPaidDate = value;
           } else {
             consumers[index][field] = parseFloat(value) || 0;
           }
-          localStorage.setItem("consumers_v2", JSON.stringify(consumers));
+          localStorage.setItem("consumers_v3", JSON.stringify(consumers));
           renderTable();
         }
       }
@@ -434,7 +407,7 @@
 
       // Save State Array & Render Document Output Engine
       function saveAndRender() {
-        localStorage.setItem("consumers_v2", JSON.stringify(consumers));
+        localStorage.setItem("consumers_v3", JSON.stringify(consumers));
         renderTable();
       }
 
@@ -473,10 +446,19 @@
           try {
             const parsed = JSON.parse(reader.result);
             if (parsed.consumers && Array.isArray(parsed.consumers)) {
-              currentRate = parsed.rate || 225;
-              consumers = parsed.consumers;
+              currentRate = parsed.rate || 226;
+              consumers = parsed.consumers.map((c) => ({
+                id: c.id || Date.now() + Math.random(),
+                name: c.name || "Unnamed Consumer",
+                lastAmountPaid:
+                  c.lastAmountPaid !== undefined
+                    ? c.lastAmountPaid
+                    : c.amountPaid || 0,
+                initialReading: c.initialReading || 0,
+                finalReading: c.finalReading || 0,
+              }));
               document.getElementById("globalRate").value = currentRate;
-              localStorage.setItem("globalRate_v2", currentRate);
+              localStorage.setItem("globalRate_v3", currentRate);
               saveAndRender();
               alert("Template data metrics imported successfully!");
             } else {
@@ -512,14 +494,15 @@
         }
 
         consumers.forEach((c) => {
-          // Backward compatibility for existing records without the new fields
-          const lastAmt =
-            c.lastAmountPaid !== undefined ? c.lastAmountPaid : c.amountPaid;
-          const lastDate = c.lastPaidDate || "";
-
+          const lastPaid =
+            c.lastAmountPaid !== undefined ? c.lastAmountPaid : 0;
           const unitsConsumed = Math.max(0, c.finalReading - c.initialReading);
           const equivalentCost = unitsConsumed * currentRate;
-          const balance = c.amountPaid - equivalentCost;
+
+          // Balance calculated from Last Paid minus Equivalent Cost
+          const balance = lastPaid - equivalentCost;
+
+          // Eq. Units Left calculated directly from Balance
           const unitsLeft = currentRate > 0 ? balance / currentRate : 0;
 
           const balanceClass =
@@ -541,21 +524,13 @@
           const tr = document.createElement("tr");
           tr.className = "hover:bg-slate-50/80 transition-colors";
           tr.innerHTML = `
-                    <td class="px-4 py-2.5">
+                    <td class="px-5 py-2.5">
                         <input type="text" value="${c.name}" onchange="updateField(${c.id}, 'name', this.value)"
                                class="w-full bg-transparent border border-transparent hover:border-slate-200 focus:bg-white focus:border-indigo-500 rounded px-2 py-1 font-medium text-slate-700 focus:outline-hidden">
                     </td>
                     <td class="px-3 py-2.5">
-                        <input type="number" step="any" value="${c.amountPaid}" onchange="updateField(${c.id}, 'amountPaid', this.value)"
-                               class="w-full bg-transparent border border-transparent hover:border-slate-200 focus:bg-white focus:border-indigo-500 rounded px-2 py-1 focus:outline-hidden font-mono">
-                    </td>
-                    <td class="px-3 py-2.5">
-                        <input type="number" step="any" value="${lastAmt}" onchange="updateField(${c.id}, 'lastAmountPaid', this.value)"
+                        <input type="number" step="any" value="${lastPaid}" onchange="updateField(${c.id}, 'lastAmountPaid', this.value)"
                                class="w-full bg-transparent border border-transparent hover:border-slate-200 focus:bg-white focus:border-indigo-500 rounded px-2 py-1 focus:outline-hidden font-mono text-indigo-700 font-medium">
-                    </td>
-                    <td class="px-3 py-2.5">
-                        <input type="date" value="${lastDate}" onchange="updateField(${c.id}, 'lastPaidDate', this.value)"
-                               class="w-full bg-transparent border border-transparent hover:border-slate-200 focus:bg-white focus:border-indigo-500 rounded px-1.5 py-1 focus:outline-hidden text-slate-600">
                     </td>
                     <td class="px-3 py-2.5">
                         <input type="number" step="any" value="${c.initialReading}" onchange="updateField(${c.id}, 'initialReading', this.value)"
