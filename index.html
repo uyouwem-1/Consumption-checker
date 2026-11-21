@@ -451,9 +451,9 @@
                 id: c.id || Date.now() + Math.random(),
                 name: c.name || "Unnamed Consumer",
                 YourTotalAmount:
-                  c.YourTotalAmount !== undefined
-                    ? c.YourTotalAmount
-                    : c.YourTotalAmount || 0,
+                  c.LastAmountPaid !== undefined
+                    ? c.LastAmountPaid
+                    : c.LastAmountPaid || 0,
                 initialReading: c.initialReading || 0,
                 finalReading: c.finalReading || 0,
               }));
